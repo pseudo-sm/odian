@@ -21,3 +21,4 @@ class AllInfo(models.Model):
 class File(models.Model):
     file_id = models.AutoField(primary_key=True)
     file = models.FileField(upload_to="images/", max_length=100)
+    row_id = models.ForeignKey(AllInfo,null=True,blank=True,on_delete=models.CASCADE)
