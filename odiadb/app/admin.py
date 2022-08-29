@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import AllInfo,File
+from . models import Business,Product,File,BusinessProduct
 from admin_numeric_filter.admin import RangeNumericFilter, \
     SliderNumericFilter
 # Register your models here.
@@ -7,11 +7,31 @@ from admin_numeric_filter.admin import RangeNumericFilter, \
 class AdminMedia(admin.TabularInline):
     model = File
 
-class AdminAllInfo(admin.ModelAdmin):
 
-    list_display=('business_code','person_name','product','contact_no','whatsapp_no','address')
-    list_filter=('category','sub_category',('price',RangeNumericFilter),'contacted')
-    search_fields=('business_code','person_name','product','contact_no','whatsapp_no','address')
-    inlines = [AdminMedia,]
+class AdminBusinessProduct(admin.ModelAdmin):
+    list_display=('get_product_name','get_product_category','get_product_price','get_product_subcategory','get_businesses')
+    search_fields=('product__product','business__business_code','product__category','product__sub_category','business__business_code')
+    list_filter=('product__category','product__sub_category',('product__price',RangeNumericFilter),'product__product')
+    @admin.display(description='Product', ordering='product__product')
+    def get_product_name(self, obj):
+        return obj.product.product
 
-admin.site.register(AllInfo,AdminAllInfo)
+    @admin.display(description='Category', ordering='product__category')
+    def get_product_category(self, obj):
+        return obj.product.category
+    
+    @admin.display(description='Price', ordering='product__price')
+    def get_product_price(self, obj):
+        return obj.product.price
+    
+    @admin.display(description='Sub Category', ordering='product__sub_category')
+    def get_product_subcategory(self, obj):
+        return obj.product.sub_category
+    
+    @admin.display(description='Businesses')
+    def get_businesses(self, obj):
+        return ",".join([p.product for p in Product.objects.filter(product=obj.product)])
+
+admin.site.register(Business)
+admin.site.register(Product)
+admin.site.register(BusinessProduct,AdminBusinessProduct)
