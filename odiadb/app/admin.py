@@ -10,11 +10,11 @@ class AdminMedia(admin.TabularInline):
 
 class AdminBusinessProduct(admin.ModelAdmin):
     list_display=('get_product_name','get_product_category','get_product_price','get_product_subcategory','get_businesses')
-    search_fields=('product__product','business__business_code','product__category','product__sub_category','business__business_code')
-    list_filter=('product__category','product__sub_category',('product__price',RangeNumericFilter),'product__product')
-    @admin.display(description='Product', ordering='product__product')
+    search_fields=('product__product_name','business__business_code','product__category','product__sub_category','business__business_code')
+    list_filter=('product__category','product__sub_category',('product__price',RangeNumericFilter),'product__product_name','business__business_name')[::-1]
+    @admin.display(description='Product', ordering='product__product_name')
     def get_product_name(self, obj):
-        return obj.product.product
+        return obj.product.product_name
 
     @admin.display(description='Category', ordering='product__category')
     def get_product_category(self, obj):
@@ -30,7 +30,8 @@ class AdminBusinessProduct(admin.ModelAdmin):
     
     @admin.display(description='Businesses')
     def get_businesses(self, obj):
-        return ",".join([p.product for p in Product.objects.filter(product=obj.product)])
+        result = ",".join([p.business_name for p in Business.objects.filter(business_code=obj.business.business_code)])
+        return result
 
 admin.site.register(Business)
 admin.site.register(Product)
